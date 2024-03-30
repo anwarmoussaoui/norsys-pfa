@@ -1,0 +1,10 @@
+<h2>Student List</h2>
+
+<ul>
+  <li *ngFor="let student of listStudents">
+     {{student.identifier}}
+  </li>
+</ul>
+
+
+<button (click)="addStudent()">save student</button>

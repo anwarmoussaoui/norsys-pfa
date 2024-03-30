@@ -1,0 +1,113 @@
+<p></p>
+<input type="text" name="search" [(ngModel)]="searchText" (input)="performSearch()" placeholder="Search">
+<p></p>
+<div *ngIf="show">
+  <p></p>
+  <h1>Teacher List</h1>
+  <div class="card mb-4" *ngFor="let student of filteredData2" >
+    <div class="card-body">
+      <h5 class="card-title">{{student.firstName}}</h5>
+      <div class="card-subtitle text-muted mb-3">{{student.name}}</div>
+
+      <a href="javascript:void(0)" class="card-link" (click)="student.visible=!student.visible">absence</a>
+      <button class="btn btn-primary" (click)="generateTeacherPdf(student)">Générer PDF</button>
+      <div  class="table-responsive text-nowrap" *ngIf="student.visible">
+        <table class="table card-table">
+          <thead>
+          <tr>
+            <th>Date d'absence</th>
+            <th>reason</th>
+            <th>durée</th>
+            <th>justifié</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody class="table-border-bottom-0">
+          <tr *ngFor="let x of student.absences">
+            <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{x.absenceDate}}</strong></td>
+            <td>{{x.reason}}</td>
+
+            <td>{{x.numberOfDays}}</td>
+            <td><span class="badge bg-label-success me-1" *ngIf="x.justified">oui</span>
+              <span class="badge bg-label-warning me-1" *ngIf="!x.justified">non</span></td>
+            <td>
+              <button class="btn btn-primary" id='supp' (click)="deleteeTeacher(student.id,x.id)">  supprimer</button>
+              <!-- Button trigger modal -->
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#backDropModal"
+                (click)="setId(x.id)"
+              >
+                update
+              </button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1">
+                <div class="modal-dialog">
+                  <form class="modal-content" [formGroup]="form" >
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="backDropModalTitle">Modification d'absence</h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+
+                      </div>
+                      <div class="row g-2">
+                        <div class="col mb-0">
+                          <label for="emailBackdrop" class="form-label">reason</label>
+                          <input
+                            type="text"
+                            id="emailBackdrop"
+                            class="form-control"
+                            placeholder="reason"
+                            formControlName="reason"
+                            [ngModel]="x.reason"
+                          />
+                        </div>
+                        <div class="col mb-0">
+                          <label for="dobBackdrop" class="form-label">durée</label>
+                          <input
+                            type="text"
+                            id="dobBackdrop"
+                            class="form-control"
+                            placeholder="durée"
+                            formControlName="duree"
+                            [ngModel]="x.numberOfDays"
+                          />
+                        </div><div class="col mb-0">
+                        <div>
+                          <p>justifié?</p>
+                          <label>
+                            <input type="radio" formControlName="isSwitched" [value]="true" name="isSwitched"> oui
+                          </label>
+                          <p></p>
+                          <label>
+                            <input type="radio" formControlName="isSwitched" [value]="false" name="isSwitched"> non
+                          </label>
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Close
+                      </button>
+                      <button type="button" class="btn btn-primary" (click)="Update(x)">Save</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </td>
+          </tr>
+          </tbody></table>
+      </div>
+    </div>
+  </div></div>

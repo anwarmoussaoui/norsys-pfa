@@ -1,0 +1,13 @@
+#add{
+    margin-left: 70%;
+}
+input{
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  #supp{
+    background-color:rgb(238, 110, 110);
+  }

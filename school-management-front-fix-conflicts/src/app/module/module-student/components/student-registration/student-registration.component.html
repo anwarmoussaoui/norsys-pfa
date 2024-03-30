@@ -1,0 +1,321 @@
+<div class="nav-align-top mb-4">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="true" (click)="updateAjouterButton('gestionEtudiants')">
+                Gestion des étudiants
+            </button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-profile"
+                aria-controls="navs-top-profile" aria-selected="false" (click)="updateAjouterButton('absence')">
+                Absences
+            </button>
+        </li>
+        <li class="nav-item">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-messages"
+                aria-controls="navs-top-messages" aria-selected="false" (click)="updateAjouterButton('emploiTemps')">
+                Emploi de temps
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="card-body">
+            <div class = "flex-container">
+            <div class="demo-inline-spacing">
+                <button type="button" class="btn btn-primary"
+                 data-bs-toggle="modal" data-bs-target="#addStudent" *ngIf="showAjouterButton">Ajouter</button>
+            </div>
+            <form [formGroup]="searchForm" class="d-flex" (ngSubmit)="searchStudents()">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" formControlName="keyword" />
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </form>
+            </div>
+        </div> 
+
+        <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
+            <div class="card">
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Address</th>
+                                <th>Identifier</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            <tr *ngFor="let student of studentList$ | async">
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.firstName }}</td>
+                                <td>{{ student.address }}</td>
+                                <td>{{ student.identifier }}</td>
+                                <td>
+                                    <span [ngClass]="student.isActive ? 'badge bg-label-primary me-1' : 'badge bg-label-danger me-1'">
+                                        {{ student.isActive ? 'Active' : 'Inactive' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                            data-bs-toggle="dropdown">
+                                            <i class="bx bx-dots-vertical-rounded"></i>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <!-- Add the unique modal ID to data-bs-target -->
+                                            <a class="dropdown-item" href="javascript:void(0);"
+                                                (click)="editStudent(student.id, student)" data-bs-toggle="modal"
+                                                data-bs-target="#editStudentModal">
+                                                <i class="bx bx-edit-alt me-1"></i> Modifier</a>
+                                            <a class="dropdown-item" href="javascript:void(0);"
+                                                (click)="deleteStudent(student.id)">
+                                                <i class="bx bx-trash me-1"></i> Supprimer</a>
+                                            <a class="dropdown-item" href="javascript:void(0);" (click)="generateCertificate(student.id)">
+                                                    <i class="bx bx-download me-1"></i> Télécharger certificat</a>
+                                            <a class="dropdown-item" href="javascript:void(0);" (click)="showDetails(student)">
+                                                <i class="bx bx-info-circle me-1" data-bs-target="#viewStudentDetails"></i> Détails</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
+            <p>
+                Donut dragée jelly pie halvah. Danish gingerbread bonbon cookie wafer candy oat cake ice
+                cream. Gummies halvah tootsie roll muffin biscuit icing dessert gingerbread. Pastry ice cream
+                cheesecake fruitcake.
+            </p>
+            <p class="mb-0">
+                Jelly-o jelly beans icing pastry cake cake lemon drops. Muffin muffin pie tiramisu halvah
+                cotton candy liquorice caramels.
+            </p>
+        </div>
+        <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
+            <p>
+                Oat cake chupa chups dragée donut toffee. Sweet cotton candy jelly beans macaroon gummies
+                cupcake gummi bears cake chocolate.
+            </p>
+            <p class="mb-0">
+                Cake chocolate bar cotton candy apple pie tootsie roll ice cream apple pie brownie cake. Sweet
+                roll icing sesame snaps caramels danish toffee. Brownie biscuit dessert dessert. Pudding jelly
+                jelly-o tart brownie jelly.
+            </p>
+        </div>
+    </div>
+    
+</div>
+
+<!-- edit student -->
+
+<div id="editStudentModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form [formGroup]="updateStudentForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modification des informations</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-lastname">Nom</label>
+                            <input type="text" class="form-control" id="basic-default-lastname" placeholder="Nom"
+                                formControlName="name" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="basic-default-firstname">Prénom</label>
+                            <input type="text" class="form-control" id="basic-default-firstname" placeholder="Prénom"
+                                formControlName="firstName" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-addres">Adresse</label>
+                            <input type="text" class="form-control" id="basic-default-addres" placeholder="Adresse"
+                                formControlName="address" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="basic-default-identifier">Identifier</label>
+                            <input type="text" class="form-control" id="basic-default-identifier"
+                                placeholder="Identifier" formControlName="identifier"
+                                (change)="onIdentifierChange($event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="cancelUpdate()" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" (click)="updateStudent()" data-bs-dismiss="modal">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- add student pop up -->
+
+<div id="addStudent" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form [formGroup]="addStudentForm">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-lastname">Nom</label>
+                            <input type="text" class="form-control" formControlName="name"  id="basic-default-lastname" placeholder="nom" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="basic-default-firstname">Prénom</label>
+                            <input type="text" class="form-control"  formControlName="firstName" id="basic-default-firstname" placeholder="prénom" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-dateOfBirth">Date de naissance</label>
+                            <input type="date" class="form-control" formControlName="dateOfBirth" id="basic-default-dateOfBirth" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="basic-default-addres">Adresse</label>
+                            <input type="text" class="form-control" formControlName="address" id="basic-default-addres" placeholder="adresse" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-identifier">Identifier</label>
+                            <input type="text" class="form-control" formControlName="identifier" id="basic-default-identifier" placeholder="identifier" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="basic-default-level">Level</label>
+                            <input type="text" class="form-control"  formControlName="level" id="basic-default-level" placeholder="level" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-educationalPath">Parcours pédagogique</label>
+                            <input type="text" class="form-control" formControlName="educationalPath" id="basic-default-educationalPath" placeholder="parcours" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                        <label class="form-label" for="basic-default-isActive">isActive</label>
+                            <select class="form-select" formControlName="isActive" id="basic-default-isActive">
+                                 <option value="true">Active</option>
+                                 <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col"></div> 
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label" for="basic-default-healthCondition">Etat de santé</label>
+                            <input type="text" class="form-control" formControlName="healthCondition" id="basic-default-healthCondition" placeholder="état de santé" />
+                        </div>
+                    </div>
+                    <fieldset formGroupName="parent"> 
+                        <div class="mb-3">
+                            <label for="parentName">Parent Name</label>
+                            <input type="text" formControlName="name" class="form-control" id="parentName" placeholder="Enter parent name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentFirstName">Parent First Name</label>
+                            <input type="text" formControlName="firstName" class="form-control" id="parentFirstName"
+                                placeholder="Enter parent first name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentAddress">Parent Address</label>
+                            <input type="text" formControlName="address" class="form-control" id="parentAddress"
+                                placeholder="Enter parent address">
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentPhoneNumber">Parent Phone Number</label>
+                            <input type="text" formControlName="phoneNumber" class="form-control" id="parentPhoneNumber"
+                                placeholder="Enter parent phone number">
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentOccupation">Parent Occupation</label>
+                            <input type="text" formControlName="occupation" class="form-control" id="parentOccupation"
+                                placeholder="Enter parent occupation">
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentEmailAddress">Parent Email Address</label>
+                            <input type="text" formControlName="emailAddress" class="form-control" id="parentEmailAddress"
+                                placeholder="Enter parent email address">
+                        </div>
+                    </fieldset>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="cancelAdd()"
+                        data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" (click)="addStudent()"
+                        data-bs-dismiss="modal">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="selectedStudent" class="student-details-popup">
+    <div class="student-details-content">
+        <h5>Détails de l'étudiant</h5>
+        <p><strong>Nom:</strong> {{ selectedStudent.name }}</p>
+        <p><strong>Prénom:</strong> {{ selectedStudent.firstName }}</p>
+        <p><strong>Identifiant:</strong> {{ selectedStudent.identifier }}</p>
+        <p><strong>Adresse:</strong> {{ selectedStudent.address }}</p>
+        <p><strong>Niveau:</strong> {{ selectedStudent.level }}</p>
+        <p><strong>Parcours éducatif:</strong> {{ selectedStudent.educationalPath }}</p>
+        <p><strong>État de santé:</strong> {{ selectedStudent.healthCondition }}</p>
+        <div class="button">
+            <button type="close-button" class="btn btn-primary" (click)="selectedStudent = null">Fermer</button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- pagination  -->
+   
+ <div class="fixed-bottom">
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item first">
+                <a class="page-link" href="javascript:void(0);" (click)="onPageChange({ pageIndex: 0, pageSize: pageSize })">
+                    <i class="tf-icon bx bx-chevrons-left"></i>
+                </a>
+            </li>
+            <li class="page-item prev">
+                <a class="page-link" href="javascript:void(0);" (click)="onPageChange({ pageIndex: currentPage - 1, pageSize: pageSize })">
+                    <i class="tf-icon bx bx-chevron-left"></i>
+                </a>
+            </li>
+            <ng-container *ngFor="let page of getPages(totalElements, pageSize)">
+                <li class="page-item" [class.active]="page === currentPage">
+                    <a class="page-link" href="javascript:void(0);" (click)="onPageChange({ pageIndex: page, pageSize: pageSize })">
+                        {{ page + 1 }}
+                    </a>
+                </li>
+            </ng-container>
+            <li class="page-item next">
+                <a class="page-link" href="javascript:void(0);" (click)="onPageChange({ pageIndex: currentPage + 1, pageSize: pageSize })">
+                    <i class="tf-icon bx bx-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item last">
+                <a class="page-link" href="javascript:void(0);" (click)="onPageChange({ pageIndex: getLastPageIndex(), pageSize: pageSize })">
+                    <i class="tf-icon bx bx-chevrons-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
